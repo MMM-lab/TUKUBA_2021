@@ -2,8 +2,20 @@
 //MPU board:  NUCLEO-F401RE
 //Motor driver: TA7291P x 2
 //=========================================================
+/*  Nucleo-F401RE   */
 #include "mbed.h"
 #include "math.h"
+
+/* ROS */
+#include <ros.h>
+#include <std_msgs/Int32MultiArray.h>
+#include <std_msgs/Float32MultiArray.h>
+#include <ros/time.h>
+
+/* ROS */
+ros::NodeHandle  nh;
+std_msgs::Int32MultiArray encoder_data;
+ros::Publisher encoder_pub("encoder", &encoder_data);
 
 //=========================================================
 // ロータリーエンコーダの出力を受けるためにBusInクラスを使用して
@@ -62,7 +74,25 @@ void rotary_encoder_check()
     //update the encoder value
     int value = -1 * table[code];
     encoder_value += value;
+    // 左右のエンコーダ値をpublishする
+    encoder_data.data[0] = encoder_value;
+    encoder_data.data[1] = encoder_value; 
+    encoder_pub.publish(&encoder_data);
     return;
+}
+
+void encoder_init()
+{
+    /* ROS */
+    encoder_data.data_length = 2;
+    encoder_data.data        = (int32_t *)malloc(sizeof(int32_t)*2);
+    encoder_data.data[0]     = 0;
+    encoder_data.data[1]     = 0;
+
+    //nh.getHardware()->setBaud(230400);
+    nh.initNode();
+    //nh.subscribe(cmdmotorspeed_sub);
+    nh.advertise(encoder_pub);
 }
 
 //=========================================================
@@ -72,6 +102,7 @@ int main() {
     //-------------------------------------------
     //Rotary encoder initialization
     //-------------------------------------------
+    encoder_init();
     encoder_value = 0;  
 
     //-------------------------------------------
