@@ -15,4 +15,4 @@ roslaunch turtlebot3_navigation turtlebot3_navigation.launch map_file:=$HOME/map
 ```
 rosrun waypoint_specification waypoint_specification_node
 ```
-
+![Screenshot from 2020-09-06 00-06-38](https://user-images.githubusercontent.com/52307432/92320332-a0055d00-efd5-11ea-86e7-21afef85a0f1.png)
