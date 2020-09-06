@@ -20,3 +20,7 @@ rosrun waypoint_specification waypoint_specification_node
 ![Screenshot from 2020-09-06 00-06-46](https://user-images.githubusercontent.com/52307432/92320353-b3b0c380-efd5-11ea-87ef-3bde640a922c.png)
 ![Screenshot from 2020-09-06 00-06-48](https://user-images.githubusercontent.com/52307432/92320357-b7444a80-efd5-11ea-8356-af60622e998a.png)
 ![Screenshot from 2020-09-06 00-07-07](https://user-images.githubusercontent.com/52307432/92320361-b90e0e00-efd5-11ea-9f7c-200cf202dfcc.png)
+
+### ゴール判定の緩め方
+xy_goal_tolerance, yaw_goal_toleranceを調整すれば良い
+https://sy-base.com/myrobotics/ros/ros-dwa-local-planner/
