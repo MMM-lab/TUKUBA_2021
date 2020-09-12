@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <launch>
   <!-- Arguments -->
-  <arg name="map_file" default="$(find 2D_Navigation_Stack)/maps/room_ok.yaml"/>
+  <!--<arg name="map_file" default="$(find 2D_Navigation_Stack)/maps/room_ok.yaml"/>-->
+  <arg name="map_file" default="$(find 2D_Navigation_Stack)/maps/map.yaml"/>
 
   <!-- Run the map server -->
   <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" output="screen"/>
@@ -11,13 +12,14 @@
 
   <!-- move base -->
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
-    <param name="controller_frequency" value="10.0"/>
-    <param name="controller_patiente" value="15.0"/>
+    <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
+    <rosparam file="$(find 2D_Navigation_Stack)/launch/move_base_params.yaml" command="load" />
     <rosparam file="$(find 2D_Navigation_Stack)/launch/costmap_common_params.yaml" command="load" ns="global_costmap" />
     <rosparam file="$(find 2D_Navigation_Stack)/launch/costmap_common_params.yaml" command="load" ns="local_costmap" />
     <rosparam file="$(find 2D_Navigation_Stack)/launch/local_costmap_params.yaml" command="load" />
     <rosparam file="$(find 2D_Navigation_Stack)/launch/global_costmap_params.yaml" command="load" />
     <rosparam file="$(find 2D_Navigation_Stack)/launch/base_local_planner_params.yaml" command="load" />
+    <rosparam file="$(find 2D_Navigation_Stack)/launch/dwa_local_planner_params.yaml" command="load" />
   </node>
 
 </launch>
