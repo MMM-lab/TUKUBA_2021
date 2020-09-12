@@ -1,0 +1,3 @@
+[submodule "MMM_px4"]
+	path = MMM_px4
+	url = https://github.com/MMM-lab/MMM_px4.git
