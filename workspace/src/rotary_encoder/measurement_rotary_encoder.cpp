@@ -6,16 +6,36 @@
 #include "mbed.h"
 #include "math.h"
 
-/* ROS */
-#include <ros.h>
-#include <std_msgs/Int32MultiArray.h>
-#include <std_msgs/Float32MultiArray.h>
-#include <ros/time.h>
+/* serial communication */
+Serial pc(USBTX, USBRX);
 
 /* ROS */
-ros::NodeHandle  nh;
+/*#include <ros.h>
+#include <std_msgs/Int32MultiArray.h>
+#include <std_msgs/Float32MultiArray.h>
+#include <ros/time.h>*?
+
+/* ROS */
+/*ros::NodeHandle  nh;
 std_msgs::Int32MultiArray encoder_data;
-ros::Publisher encoder_pub("encoder", &encoder_data);
+ros::Publisher encoder_pub("encoder", &encoder_data);*/
+
+//=========================================================
+// タイヤの半径
+const float wheel_radius = 0.0925f;
+// 車輪感距離
+const float wheel_to_wheel_distance = 0.25f;
+// 両車輪の移動速度
+float left_vel  = 0.0f;
+float right_vel = 0.0f;
+// ロボットの並進速度
+float linear_vel = 0.0f;
+// ロボットの回転速度
+float angular_vel = 0.0f;
+// ロボットの位置と姿勢
+float x     = 0.0f;
+float y     = 0.0f;
+float theta = 0.0f;
 
 //=========================================================
 // ロータリーエンコーダの出力を受けるためにBusInクラスを使用して
@@ -75,15 +95,14 @@ void rotary_encoder_check()
     int value = -1 * table[code];
     encoder_value += value;
     // 左右のエンコーダ値をpublishする
-    encoder_data.data[0] = encoder_value;
+    /*encoder_data.data[0] = encoder_value;
     encoder_data.data[1] = encoder_value; 
-    encoder_pub.publish(&encoder_data);
+    encoder_pub.publish(&encoder_data);*/
     return;
 }
 
-void encoder_init()
+/*void encoder_init()
 {
-    /* ROS */
     encoder_data.data_length = 2;
     encoder_data.data        = (int32_t *)malloc(sizeof(int32_t)*2);
     encoder_data.data[0]     = 0;
@@ -93,7 +112,7 @@ void encoder_init()
     nh.initNode();
     //nh.subscribe(cmdmotorspeed_sub);
     nh.advertise(encoder_pub);
-}
+}*/
 
 //=========================================================
 // Main
@@ -102,7 +121,8 @@ int main() {
     //-------------------------------------------
     //Rotary encoder initialization
     //-------------------------------------------
-    encoder_init();
+    pc.baud(115200);
+    //encoder_init();
     encoder_value = 0;  
 
     //-------------------------------------------
@@ -125,14 +145,31 @@ int main() {
     //===========================================    
     while(1)
     {
+        // タイヤの回転角
         rotation_angle            = encoder_value * (2*3.14f)/(4*rotary_encoder_resolution);
+        // タイヤの回転速度
         rotation_angular_velocity = (rotation_angle - pre_rotation_angle) / feedback_rate;
+        /* デッドレコニング(オドメトリ) */
+        // ロボットの移動速度
+        left_vel    = rotation_angular_velocity * wheel_radius;
+        right_vel   = rotation_angular_velocity * wheel_radius;
+        linear_vel  = (right_vel + left_vel) / 2.0f;
+        angular_vel = (right_vel - left_vel) / wheel_to_wheel_distance;
+        // ロボットの位置
+        x     = x + linear_vel * feedback_rate * cos(theta + angular_vel / 2.0f);
+        y     = y + linear_vel * feedback_rate * sin(theta + angular_vel / 2.0f);
+        theta = theta + angular_vel * feedback_rate;
         
+        // タイヤの回転角と回転速度
+        pc.printf("%f\r%f\r%d\r", rotation_angle, rotation_angular_velocity, encoder_value);
+        // ロボットの位置
+        pc.printf("%f\r%f\r%f\r\n", x, y, theta);
+
         //---------------------------------------
         //Motor control
         //---------------------------------------
         // 本来この値は何かしらの制御則によって算出されるべき
-        motor_value = 2;
+        motor_value = 2.0f;
         
         //offset
         if(motor_value > 0)
