@@ -210,9 +210,9 @@ int main() {
 
         //set the velocity
         odom.child_frame_id = "base_footprint";
-        odom.twist.twist.linear.x  = vx;
+        odom.twist.twist.linear.x  = linear_vel;
         odom.twist.twist.linear.y  = 0.0;
-        odom.twist.twist.angular.z = vth;
+        odom.twist.twist.angular.z = angular_vel;
 
         //publish the message
         odom_pub.publish(odom);
