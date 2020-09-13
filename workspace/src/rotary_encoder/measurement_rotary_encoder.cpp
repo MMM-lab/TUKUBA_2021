@@ -6,6 +6,11 @@
 #include "mbed.h"
 #include "math.h"
 
+/* ROS */
+#include <ros/ros.h>
+#include <tf/transform_broadcaster.h>
+#include <nav_msgs/Odometry.h>
+
 /* serial communication */
 Serial pc(USBTX, USBRX);
 
@@ -19,6 +24,11 @@ Serial pc(USBTX, USBRX);
 /*ros::NodeHandle  nh;
 std_msgs::Int32MultiArray encoder_data;
 ros::Publisher encoder_pub("encoder", &encoder_data);*/
+
+/* ROS */
+ros::NodeHandle  nh;
+ros::Publisher odom_pub;
+tf::TransformBroadcaster odom_broadcaster;
 
 //=========================================================
 // タイヤの半径
@@ -101,32 +111,31 @@ void rotary_encoder_check()
     return;
 }
 
-/*void encoder_init()
+void ros_init()
 {
-    encoder_data.data_length = 2;
-    encoder_data.data        = (int32_t *)malloc(sizeof(int32_t)*2);
-    encoder_data.data[0]     = 0;
-    encoder_data.data[1]     = 0;
-
     //nh.getHardware()->setBaud(230400);
     nh.initNode();
     //nh.subscribe(cmdmotorspeed_sub);
-    nh.advertise(encoder_pub);
-}*/
+    odom_pub = nh.advertise<nav_msgs::Odometry>("odom", 50);
+}
 
-//=========================================================
-// Main
-//=========================================================
+/**
+ *****************************************************************************************************
+ * MAIN METHOD
+ *****************************************************************************************************
+*/
 int main() {   
+    /***********************************************************************
+     * Initialization
+     **********************************************************************/
     //-------------------------------------------
-    //Rotary encoder initialization
+    // System initialization
     //-------------------------------------------
     pc.baud(115200);
-    //encoder_init();
-    encoder_value = 0;  
+    ros_init();
 
     //-------------------------------------------
-    //Motor driver intialization
+    // Motor driver intialization
     //-------------------------------------------
     IN1 = 0; //motor stop
     IN2 = 0; //motor stop
@@ -134,17 +143,28 @@ int main() {
     motor.pulsewidth_us(0); //0 to 100
 
     //-------------------------------------------  
-    //Timer
+    // Timer
     //-------------------------------------------  
     //timer1: rotary encoder polling, 40 kHz
     timer1.attach_us(&rotary_encoder_check, rotary_encoder_update_rate);
- 
-    //===========================================
-    //Main loop
-    //it takes 700 usec (calculation)
-    //===========================================    
+    ros::Time current_time;
+    ros::Rate r(10);
+
+    /**
+     ***********************************************************************
+     * main loop
+     ***********************************************************************
+    */
     while(1)
     {
+        ros::spinOnce();        
+        current_time = ros::Time::now();
+
+        /**
+         ***********************************************************************
+         * Odometry
+         ***********************************************************************
+        */
         // タイヤの回転角
         rotation_angle            = encoder_value * (2*3.14f)/(4*rotary_encoder_resolution);
         // タイヤの回転速度
@@ -159,15 +179,54 @@ int main() {
         x     = x + linear_vel * feedback_rate * cos(theta + angular_vel / 2.0f);
         y     = y + linear_vel * feedback_rate * sin(theta + angular_vel / 2.0f);
         theta = theta + angular_vel * feedback_rate;
+
+        //since all odometry is 6DOF we'll need a quaternion created from yaw
+        geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(theta);
+
+        //first, we'll publish the transform over tf
+        geometry_msgs::TransformStamped odom_trans;
+        odom_trans.header.stamp    = current_time;
+        odom_trans.header.frame_id = "odom";
+        odom_trans.child_frame_id  = "base_footprint";
+
+        odom_trans.transform.translation.x = x;
+        odom_trans.transform.translation.y = y;
+        odom_trans.transform.translation.z = 0.0;
+        odom_trans.transform.rotation = odom_quat;
+
+        //send the transform
+        odom_broadcaster.sendTransform(odom_trans);
+
+        //next, we'll publish the odometry message over ROS
+        nav_msgs::Odometry odom;
+        odom.header.stamp = current_time;
+        odom.header.frame_id = "odom";
+
+        //set the position
+        odom.pose.pose.position.x  = x;
+        odom.pose.pose.position.y  = y;
+        odom.pose.pose.position.z  = 0.0;
+        odom.pose.pose.orientation = odom_quat;
+
+        //set the velocity
+        odom.child_frame_id = "base_footprint";
+        odom.twist.twist.linear.x  = vx;
+        odom.twist.twist.linear.y  = 0.0;
+        odom.twist.twist.angular.z = vth;
+
+        //publish the message
+        odom_pub.publish(odom);
         
         // タイヤの回転角と回転速度
-        pc.printf("%f\r%f\r%d\r", rotation_angle, rotation_angular_velocity, encoder_value);
+        //pc.printf("%f\r%f\r%d\r", rotation_angle, rotation_angular_velocity, encoder_value);
         // ロボットの位置
-        pc.printf("%f\r%f\r%f\r\n", x, y, theta);
+        //pc.printf("%f\r%f\r%f\r\n", x, y, theta);
 
-        //---------------------------------------
-        //Motor control
-        //---------------------------------------
+        /**
+         ***********************************************************************
+         * Moter Control
+         ***********************************************************************
+        */
         // 本来この値は何かしらの制御則によって算出されるべき
         motor_value = 2.0f;
         
@@ -241,5 +300,7 @@ int main() {
         pre_rotation_angle = rotation_angle;
         // wait 
         wait(feedback_rate);    
+
+        r.sleep();
     }    
 }
