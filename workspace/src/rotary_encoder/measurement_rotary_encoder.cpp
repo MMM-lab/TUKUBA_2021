@@ -113,7 +113,7 @@ void rotary_encoder_check()
 
 void ros_init()
 {
-    //nh.getHardware()->setBaud(230400);
+    nh.getHardware()->setBaud(57600);
     nh.initNode();
     //nh.subscribe(cmdmotorspeed_sub);
     odom_pub = nh.advertise<nav_msgs::Odometry>("odom", 50);
@@ -131,7 +131,7 @@ int main() {
     //-------------------------------------------
     // System initialization
     //-------------------------------------------
-    pc.baud(115200);
+    //pc.baud(115200);
     ros_init();
 
     //-------------------------------------------
