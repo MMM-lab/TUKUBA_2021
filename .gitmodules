@@ -1,3 +1,6 @@
 [submodule "MMM_px4"]
 	path = MMM_px4
 	url = https://github.com/MMM-lab/MMM_px4.git
+[submodule "workspace/src/MMM_navigation"]
+	path = workspace/src/MMM_navigation
+	url = https://github.com/MMM-lab/MMM_navigation
