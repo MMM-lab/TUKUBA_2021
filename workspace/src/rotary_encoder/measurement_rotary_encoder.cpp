@@ -6,28 +6,21 @@
 #include "mbed.h"
 #include "math.h"
 
-/* ROS */
-#include <ros/ros.h>
-#include <tf/transform_broadcaster.h>
-#include <nav_msgs/Odometry.h>
-
 /* serial communication */
 Serial pc(USBTX, USBRX);
 
 /* ROS */
-/*#include <ros.h>
-#include <std_msgs/Int32MultiArray.h>
-#include <std_msgs/Float32MultiArray.h>
-#include <ros/time.h>*?
+#include <ros.h>
+#include <ros/time.h>
+#include <tf/tf.h>
+#include <geometry_msgs/Twist.h>
+#include <tf/transform_broadcaster.h>
+#include <nav_msgs/Odometry.h>
 
-/* ROS */
-/*ros::NodeHandle  nh;
-std_msgs::Int32MultiArray encoder_data;
-ros::Publisher encoder_pub("encoder", &encoder_data);*/
-
-/* ROS */
-ros::NodeHandle  nh;
-ros::Publisher odom_pub;
+ros::NodeHandle nh;
+nav_msgs::Odometry odom;
+geometry_msgs::TransformStamped odom_trans;
+ros::Publisher odom_pub("odom", &odom);
 tf::TransformBroadcaster odom_broadcaster;
 
 //=========================================================
@@ -104,10 +97,7 @@ void rotary_encoder_check()
     //update the encoder value
     int value = -1 * table[code];
     encoder_value += value;
-    // 左右のエンコーダ値をpublishする
-    /*encoder_data.data[0] = encoder_value;
-    encoder_data.data[1] = encoder_value; 
-    encoder_pub.publish(&encoder_data);*/
+    
     return;
 }
 
@@ -115,8 +105,8 @@ void ros_init()
 {
     nh.getHardware()->setBaud(57600);
     nh.initNode();
-    //nh.subscribe(cmdmotorspeed_sub);
-    odom_pub = nh.advertise<nav_msgs::Odometry>("odom", 50);
+    nh.advertise(odom_pub);
+    odom_broadcaster.init(nh);
 }
 
 /**
@@ -147,8 +137,6 @@ int main() {
     //-------------------------------------------  
     //timer1: rotary encoder polling, 40 kHz
     timer1.attach_us(&rotary_encoder_check, rotary_encoder_update_rate);
-    ros::Time current_time;
-    ros::Rate r(10);
 
     /**
      ***********************************************************************
@@ -157,9 +145,6 @@ int main() {
     */
     while(1)
     {
-        ros::spinOnce();        
-        current_time = ros::Time::now();
-
         /**
          ***********************************************************************
          * Odometry
@@ -180,42 +165,36 @@ int main() {
         y     = y + linear_vel * feedback_rate * sin(theta + angular_vel / 2.0f);
         theta = theta + angular_vel * feedback_rate;
 
-        //since all odometry is 6DOF we'll need a quaternion created from yaw
-        geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(theta);
-
         //first, we'll publish the transform over tf
-        geometry_msgs::TransformStamped odom_trans;
-        odom_trans.header.stamp    = current_time;
+        odom_trans.header.stamp    = nh.now();
         odom_trans.header.frame_id = "odom";
         odom_trans.child_frame_id  = "base_footprint";
 
         odom_trans.transform.translation.x = x;
         odom_trans.transform.translation.y = y;
         odom_trans.transform.translation.z = 0.0;
-        odom_trans.transform.rotation = odom_quat;
+        odom_trans.transform.rotation      = tf::createQuaternionFromYaw(theta);
 
         //send the transform
         odom_broadcaster.sendTransform(odom_trans);
 
         //next, we'll publish the odometry message over ROS
-        nav_msgs::Odometry odom;
-        odom.header.stamp = current_time;
+        odom.header.stamp = nh.now();
         odom.header.frame_id = "odom";
 
         //set the position
         odom.pose.pose.position.x  = x;
         odom.pose.pose.position.y  = y;
         odom.pose.pose.position.z  = 0.0;
-        odom.pose.pose.orientation = odom_quat;
+        odom.pose.pose.orientation = tf::createQuaternionFromYaw(theta);
 
         //set the velocity
-        odom.child_frame_id = "base_footprint";
+        odom.child_frame_id = "base_link";
         odom.twist.twist.linear.x  = linear_vel;
-        odom.twist.twist.linear.y  = 0.0;
         odom.twist.twist.angular.z = angular_vel;
 
         //publish the message
-        odom_pub.publish(odom);
+        odom_pub.publish(&odom);
         
         // タイヤの回転角と回転速度
         //pc.printf("%f\r%f\r%d\r", rotation_angle, rotation_angular_velocity, encoder_value);
@@ -299,8 +278,7 @@ int main() {
         // prepare for the next calculation of theta2_dot
         pre_rotation_angle = rotation_angle;
         // wait 
+        nh.spinOnce();  
         wait(feedback_rate);    
-
-        r.sleep();
     }    
 }
