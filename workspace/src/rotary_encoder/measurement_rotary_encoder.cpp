@@ -168,7 +168,7 @@ int main() {
         //first, we'll publish the transform over tf
         odom_trans.header.stamp    = nh.now();
         odom_trans.header.frame_id = "odom";
-        odom_trans.child_frame_id  = "base_footprint";
+        odom_trans.child_frame_id  = "base_link";
 
         odom_trans.transform.translation.x = x;
         odom_trans.transform.translation.y = y;
@@ -207,7 +207,7 @@ int main() {
          ***********************************************************************
         */
         // 本来この値は何かしらの制御則によって算出されるべき
-        motor_value = 2.0f;
+        motor_value = 0.5f;
         
         //offset
         if(motor_value > 0)
@@ -279,6 +279,7 @@ int main() {
         pre_rotation_angle = rotation_angle;
         // wait 
         nh.spinOnce();  
-        wait(feedback_rate);    
+        wait(feedback_rate);
+        wait_ms(1000);    
     }    
 }
