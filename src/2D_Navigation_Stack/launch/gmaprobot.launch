@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<launch>
+    <param name="/use_sim_time" value="true" />
+    <arg name="x_pos" default="-2.0"/>
+    <arg name="y_pos" default="-0.5"/>
+    <arg name="z_pos" default="0.0"/>
+
+  <!--<arg name="model" />
+  <param name="robot_description" command="$(find xacro)/xacro.py $(arg model)" />-->
+  <arg name="model" default="$(find 2D_Navigation_Stack)/urdf/gmapbot.xacro"/>
+  <param name="robot_description" command="$(find xacro)/xacro $(arg model) --inorder"/>
+
+  <include file="$(find 2D_Navigation_Stack)/launch/warehouse_world.launch"/>
+  
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" ></node>
+  
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen" >
+    <param name="publish_frequency" type="double" value="50.0" />
+  </node>
+
+  <!--robot_model-->
+  <!--<node name="spawn_robot" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -z 0.1 -model robot_model" respawn="false" output="screen" />-->
+  <node pkg="gazebo_ros" type="spawn_model" name="spawn_urdf"  args="-urdf -model $(arg model) -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -param robot_description" />
+  <!--node name="slam_gmapping" pkg="gmapping" type="slam_gmapping"> </node>
+ 
+    <remap from="scan" to="/robot/laser/scan"/>
+    <param name="base_link" value="base_footprint"/-->
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find 2D_Navigation_Stack)/launch/navigation.rviz" />
+  
+</launch>

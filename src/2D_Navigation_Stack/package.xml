@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>2D_Navigation_Stack</name>
+  <version>0.0.0</version>
+  <description>The 2D_Navigation_Stack package</description>
+
+  <maintainer email="ramune@todo.todo">ramune</maintainer>
+
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roscpp</build_depend>
+  <build_export_depend>roscpp</build_export_depend>
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>gazebo_ros</exec_depend>
+
+  <export>
+    <gazebo_ros gazebo_model_path="${prefix}/meshes" /> 
+  </export>
+</package>
