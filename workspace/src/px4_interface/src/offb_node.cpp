@@ -5,10 +5,11 @@
  */
 
 #include <ros/ros.h>
-#include <geometry_msgs/PoseStamped.h>
 #include <mavros_msgs/CommandBool.h>
 #include <mavros_msgs/SetMode.h>
 #include <mavros_msgs/State.h>
+#include <geometry_msgs/Twist.h>
+#include <iostream>
 
 mavros_msgs::State current_state;
 void state_cb(const mavros_msgs::State::ConstPtr& msg){
@@ -22,12 +23,12 @@ int main(int argc, char **argv)
 
     ros::Subscriber state_sub = nh.subscribe<mavros_msgs::State>
             ("mavros/state", 10, state_cb);
-    ros::Publisher local_pos_pub = nh.advertise<geometry_msgs::PoseStamped>
-            ("mavros/setpoint_position/local", 10);
     ros::ServiceClient arming_client = nh.serviceClient<mavros_msgs::CommandBool>
             ("mavros/cmd/arming");
     ros::ServiceClient set_mode_client = nh.serviceClient<mavros_msgs::SetMode>
             ("mavros/set_mode");
+    ros::Publisher local_vel_pub = nh.advertise<geometry_msgs::Twist>
+            ("/mavros/setpoint_velocity/cmd_vel_unstamped", 10);
 
     //the setpoint publishing rate MUST be faster than 2Hz
     ros::Rate rate(20.0);
@@ -38,14 +39,13 @@ int main(int argc, char **argv)
         rate.sleep();
     }
 
-    geometry_msgs::PoseStamped pose;
-    pose.pose.position.x = 0;
-    pose.pose.position.y = 0;
-    pose.pose.position.z = 2;
+    geometry_msgs::Twist vel;
+    vel.linear.x = 0.0;
+    vel.angular.z = -0.3;
 
     //send a few setpoints before starting
     for(int i = 100; ros::ok() && i > 0; --i){
-        local_pos_pub.publish(pose);
+        local_vel_pub.publish(vel);
         ros::spinOnce();
         rate.sleep();
     }
@@ -77,7 +77,10 @@ int main(int argc, char **argv)
             }
         }
 
-        local_pos_pub.publish(pose);
+        local_vel_pub.publish(vel);
+        ROS_INFO("is arm %d", current_state.armed);
+        std::cout << current_state.mode <<
+        std::endl;
 
         ros::spinOnce();
         rate.sleep();
