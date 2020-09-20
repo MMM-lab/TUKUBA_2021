@@ -40,8 +40,8 @@ int main(int argc, char **argv)
     }
 
     geometry_msgs::Twist vel;
-    vel.linear.x = 0.0;
-    vel.angular.z = -0.3;
+    vel.linear.x = 2.0;
+    vel.angular.z = -0.5;
 
     //send a few setpoints before starting
     for(int i = 100; ros::ok() && i > 0; --i){
