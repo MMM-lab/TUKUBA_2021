@@ -26,3 +26,7 @@ catkin_package(
 add_executable(offb_node src/offb_node.cpp)
 target_link_libraries(offb_node ${catkin_LIBRARIES})
 add_dependencies(offb_node px4_interface_gencpp)
+
+add_executable(odom_publisher src/odom_publisher.cpp)
+target_link_libraries(odom_publisher ${catkin_LIBRARIES})
+add_dependencies(odom_publisher px4_interface_gencpp)
