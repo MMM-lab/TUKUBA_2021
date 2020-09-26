@@ -27,8 +27,8 @@ int main(int argc, char **argv)
             ("mavros/cmd/arming");
     ros::ServiceClient set_mode_client = nh.serviceClient<mavros_msgs::SetMode>
             ("mavros/set_mode");
-    ros::Publisher local_vel_pub = nh.advertise<geometry_msgs::Twist>
-            ("/mavros/setpoint_velocity/cmd_vel_unstamped", 10);
+    /*ros::Publisher local_vel_pub = nh.advertise<geometry_msgs::Twist>
+            ("/mavros/setpoint_velocity/cmd_vel_unstamped", 10);*/
 
     //the setpoint publishing rate MUST be faster than 2Hz
     ros::Rate rate(20.0);
@@ -39,7 +39,7 @@ int main(int argc, char **argv)
         rate.sleep();
     }
 
-    geometry_msgs::Twist vel;
+    /*geometry_msgs::Twist vel;
     vel.linear.x = 2.0;
     vel.angular.z = -0.5;
 
@@ -48,7 +48,7 @@ int main(int argc, char **argv)
         local_vel_pub.publish(vel);
         ros::spinOnce();
         rate.sleep();
-    }
+    }*/
 
     mavros_msgs::SetMode offb_set_mode;
     offb_set_mode.request.custom_mode = "OFFBOARD";
@@ -77,10 +77,9 @@ int main(int argc, char **argv)
             }
         }
 
-        local_vel_pub.publish(vel);
+        //local_vel_pub.publish(vel);
         ROS_INFO("is arm %d", current_state.armed);
-        std::cout << current_state.mode <<
-        std::endl;
+        std::cout << current_state.mode << std::endl;
 
         ros::spinOnce();
         rate.sleep();
