@@ -6,6 +6,7 @@
 
 #include <ros/ros.h>
 #include <mavros_msgs/CommandBool.h>
+#include <geometry_msgs/PoseStamped.h>
 #include <mavros_msgs/SetMode.h>
 #include <mavros_msgs/State.h>
 #include <geometry_msgs/Twist.h>
@@ -27,6 +28,8 @@ int main(int argc, char **argv)
             ("mavros/cmd/arming");
     ros::ServiceClient set_mode_client = nh.serviceClient<mavros_msgs::SetMode>
             ("mavros/set_mode");
+    ros::Publisher local_pos_pub = nh.advertise<geometry_msgs::PoseStamped>
+            ("mavros/setpoint_position/local", 10);
     /*ros::Publisher local_vel_pub = nh.advertise<geometry_msgs::Twist>
             ("/mavros/setpoint_velocity/cmd_vel_unstamped", 10);*/
 
@@ -49,6 +52,18 @@ int main(int argc, char **argv)
         ros::spinOnce();
         rate.sleep();
     }*/
+
+    geometry_msgs::PoseStamped pose;
+    pose.pose.position.x = -2.0;
+    pose.pose.position.y = -0.5;
+    pose.pose.position.z = 0.0;
+
+    //send a few setpoints before starting
+    for(int i = 100; ros::ok() && i > 0; --i){
+        local_pos_pub.publish(pose);
+        ros::spinOnce();
+        rate.sleep();
+    }
 
     mavros_msgs::SetMode offb_set_mode;
     offb_set_mode.request.custom_mode = "OFFBOARD";
