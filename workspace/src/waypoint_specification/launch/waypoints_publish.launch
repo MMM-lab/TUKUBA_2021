@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<launch>
+
+    <!-- publish_waypoints -->
+   <arg name="waypoints_file" default="$(find waypoint_specification)/yaml/waypoints.yaml"/>
+   <node name="waypoints_publish" pkg="waypoint_specification" type="waypoints_publish" output="screen">
+        <param name="filename" value="$(arg waypoints_file)" />
+        <!--<rosparam command="load" file="$(find waypoint_specification)/yaml/waypoints.yaml"/>-->
+   </node>
+
+</launch>
