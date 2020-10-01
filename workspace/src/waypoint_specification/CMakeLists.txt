@@ -23,3 +23,6 @@ include_directories(
 
 add_executable(waypoint_specification_node src/waypoint_specification_node.cpp)
 target_link_libraries(waypoint_specification_node ${catkin_LIBRARIES})
+
+add_executable(save_odometry src/save_odometry.cpp)
+target_link_libraries(save_odometry ${catkin_LIBRARIES})
