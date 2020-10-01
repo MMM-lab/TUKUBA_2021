@@ -9,6 +9,7 @@
 #include <fstream>
 #include <math.h>
 #include <string>
+#include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>//for visual marker on rviz
 
 #define MAKE_ORIENTATION
@@ -39,8 +40,8 @@ public :
         }
 
         ros::NodeHandle nh;
-        marker_pub_ = nh.advertise<visualization_msgs::MarkerArray>("visualization_marker", 10);
-        
+        //marker_pub_ = nh.advertise<visualization_msgs::MarkerArray>("visualization_marker", 10);
+        marker_pub_ = nh.advertise<visualization_msgs::Marker>("marker", 10);
         /* read .yaml */
         ros::NodeHandle private_nh("~");
         std::string filename = "";
@@ -198,14 +199,16 @@ private :
             visualization_msgs::Marker marker, label;
             marker.header.frame_id = "map";
             marker.header.stamp = ros::Time::now();
-            marker.scale.x = 0.2;
-            marker.scale.y = 0.2;
-            marker.scale.z = 0.2;
+            marker.lifetime = ros::Duration();
+            marker.scale.x = 0.1;
+            marker.scale.y = 0.1;
+            marker.scale.z = 0.1;
             marker.pose.position.z = marker.scale.z / 2.0;
             marker.color.r = 0.8f;
             marker.color.g = 0.2f;
             marker.color.b = 0.2f;
-            
+            marker.color.a = 1.0f;
+
             std::stringstream name;
             name << "waypoint " << i;
             marker.ns = name.str();
@@ -214,12 +217,15 @@ private :
             marker.pose.position.y = waypoints_[i].pose.position.y;
             marker.type = visualization_msgs::Marker::SPHERE;
             marker.action = visualization_msgs::Marker::ADD;
-            marker.color.a = 1.0f;
-            markers_array.markers.push_back(marker);
+            
+            marker_pub_.publish(marker);
+
+            //markers_array.markers.push_back(marker);
             
             //ROS_INFO_STREAM("waypoints \n" << waypoints_[i]);
         }
-        marker_pub_.publish(markers_array);
+        //marker_pub_.publish(markers_array);
+        //marker_pub_.publish(marker);
     }
 };
 

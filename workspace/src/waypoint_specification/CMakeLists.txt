@@ -7,6 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
   move_base_msgs
   roscpp
   tf
+  visualization_msgs
 )
 
 find_package(PkgConfig)
@@ -15,7 +16,7 @@ pkg_search_module(yaml-cpp REQUIRED yaml-cpp)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES waypoint_specification
-  CATKIN_DEPENDS actionlib geometry_msgs move_base_msgs roscpp tf
+  CATKIN_DEPENDS actionlib geometry_msgs move_base_msgs roscpp tf visualization_msgs
 #  DEPENDS system_lib
 )
 
