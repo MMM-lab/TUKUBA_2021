@@ -23,3 +23,6 @@ include_directories(
 
 add_executable(fail_safe_scan src/fail_safe_scan.cpp)
 target_link_libraries(fail_safe_scan ${catkin_LIBRARIES})
+
+add_executable(fail_safe_along_wall src/fail_safe_along_wall.cpp)
+target_link_libraries(fail_safe_along_wall ${catkin_LIBRARIES})
