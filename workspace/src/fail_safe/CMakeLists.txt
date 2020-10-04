@@ -26,3 +26,6 @@ target_link_libraries(fail_safe_scan ${catkin_LIBRARIES})
 
 add_executable(fail_safe_along_wall src/fail_safe_along_wall.cpp)
 target_link_libraries(fail_safe_along_wall ${catkin_LIBRARIES})
+
+add_executable(fail_safe_following_people src/fail_safe_following_people.cpp)
+target_link_libraries(fail_safe_following_people ${catkin_LIBRARIES})
