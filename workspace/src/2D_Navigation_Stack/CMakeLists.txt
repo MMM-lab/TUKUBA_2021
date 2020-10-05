@@ -3,6 +3,8 @@ project(2D_Navigation_Stack)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  urdf
+  xacro
 )
 
 catkin_package(
