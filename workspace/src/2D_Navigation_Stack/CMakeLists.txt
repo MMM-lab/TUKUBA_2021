@@ -3,6 +3,7 @@ project(2D_Navigation_Stack)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  std_msgs
   urdf
   xacro
 )
