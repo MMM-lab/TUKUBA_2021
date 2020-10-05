@@ -1,17 +1,13 @@
 global_costmap:
-  #plugins: 
-  #  - {name: static_layer, type: "costmap_2d::StaticLayer"}
-  #  - {name: offlimit_layer, type: "costmap_2d::OfflimitLayer"}
   global_frame: map
-  robot_base_frame: base_link
-  #robot_base_frame: base_footprint
-  update_frequency: 10.0
-  publish_frequency: 10.0
-  #transform_tolerance: 0.5
-
-  static_map: false
-  rolling_window: true
-  width: 20.0
-  height: 20.0
-  resolution: 0.1
-  #static_map: true
+  #robot_base_frame: base_link
+  robot_base_frame: base_footprint
+  update_frequency: 1.0
+  publish_frequency: 1.0
+  transform_tolerance: 0.5
+  #static_map: false
+  static_map: true
+  #rolling_window: true
+  #width: 20.0
+  #height: 20.0
+  #resolution: 0.1
