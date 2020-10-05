@@ -14,18 +14,13 @@
     <arg name="use_sim_time" value="true" />
     <arg name="headless" value="false" />
   </include>
- 
-  <!-- urdf xml robot description loaded on the Parameter Server-->
-  <!--<param name="robot_description" command="$(find xacro)/xacro.py $(find 2D_Navigation_Stack)/urdf/wheel_robot_base.urdf.xacro" />-->
+
+  <!--<arg name="model" default="$(find 2D_Navigation_Stack)/urdf/two_wheel_robot.urdf.xacro"/>-->
   <arg name="model" default="$(find 2D_Navigation_Stack)/urdf/wheel_robot_base.urdf.xacro"/>
   <param name="robot_description" command="$(find xacro)/xacro $(arg model) --inorder"/>
 
   <!-- Setting gui parameter to true for display joint slider -->
   <param name="use_gui" value="true"/>
-  <!-- Starting Joint state publisher node which will publish the joint values -->
-  <!--<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />-->
-  <!-- Starting robot state publish which will publish tf -->
-  <!--<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />-->
   
   <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" ></node>
   

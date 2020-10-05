@@ -106,11 +106,7 @@
 
   <!-- Hokuyo Laser scanner -->
   <property name="hokuyo_size" value="0.1" />
-
-
-
   <!-- hokuyo -->
-
   <link name="hokuyo_link">
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
