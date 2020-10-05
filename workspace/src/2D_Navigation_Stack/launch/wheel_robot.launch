@@ -31,4 +31,5 @@
   <!-- push robot_description to factory and spawn robot in gazebo -->
   <node name="wheel_robot_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" 
     args="-urdf -param robot_description -model wheel_robot" />
+
 </launch>

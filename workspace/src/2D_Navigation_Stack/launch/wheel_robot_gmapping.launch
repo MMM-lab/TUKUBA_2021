@@ -55,4 +55,6 @@
     <rosparam file="$(find 2D_Navigation_Stack)/launch/move_base_params.yaml" command="load" />
   </node>
 
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find 2D_Navigation_Stack)/launch/navigation.rviz" />
+
 </launch>
