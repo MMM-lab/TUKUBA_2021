@@ -106,16 +106,12 @@
 
   <!-- Hokuyo Laser scanner -->
   <property name="hokuyo_size" value="0.1" />
-
-
-
   <!-- hokuyo -->
-
   <link name="hokuyo_link">
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <cylinder length="${hokuyo_size}" radius="${hokuyo_size}" />
+        <cylinder length="${hokuyo_size * 2}" radius="${hokuyo_size}" />
         <!--<box size="${hokuyo_size} ${hokuyo_size} ${hokuyo_size}"/>-->
       </geometry>
       <material name="Gray" />
@@ -125,7 +121,8 @@
 <!--    
 <origin xyz="${base_radius - hokuyo_size/2} 0 ${base_height+hokuyo_size/4}" rpy="0 0 0" />
 -->
-    <origin xyz="${hokuyo_size/2} 0 ${0.15+hokuyo_size/4}" rpy="0 0 0" />
+    <!--<origin xyz="${hokuyo_size/2} 0 ${0.15+hokuyo_size/4}" rpy="0 0 0" />-->
+    <origin xyz="${hokuyo_size/2} 0 ${0.2+hokuyo_size/4}" rpy="0 0 0" />
     <parent link="base_link"/>
     <child link="hokuyo_link" />
   </joint>
@@ -134,15 +131,15 @@
     <turnGravityOff>false</turnGravityOff>
     <sensor type="ray" name="head_hokuyo_sensor">
       <pose>${hokuyo_size/2} 0 0 0 0 0</pose>
-      <visualize>false</visualize>
+      <visualize>true</visualize>
       <update_rate>40</update_rate>
       <ray>
         <scan>
           <horizontal>
-            <samples>1024</samples>
+            <samples>4000</samples>
             <resolution>1</resolution>
-            <min_angle>-1.570796</min_angle>
-            <max_angle>1.570796</max_angle>
+            <min_angle>-3.14159</min_angle>
+            <max_angle>3.14159</max_angle>
           </horizontal>
         </scan>
         <range>
