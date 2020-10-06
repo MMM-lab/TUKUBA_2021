@@ -4,3 +4,6 @@
 [submodule "workspace/src/rplidar_ros"]
 	path = workspace/src/rplidar_ros
 	url = https://github.com/MMM-lab/rplidar_ros.git
+[submodule "workspace/src/magni_robot"]
+	path = workspace/src/magni_robot
+	url = https://github.com/MMM-lab/magni_robot
