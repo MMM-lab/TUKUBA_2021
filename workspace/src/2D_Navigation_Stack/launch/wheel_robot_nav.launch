@@ -2,6 +2,7 @@
   <!-- Arguments -->
   <!--<arg name="map_file" default="$(find 2D_Navigation_Stack)/maps/room_ok.yaml"/>-->
   <arg name="map_file" default="$(find 2D_Navigation_Stack)/maps/MK_room.yaml"/>
+  <!--<arg name="map_file" default="$(find 2D_Navigation_Stack)/maps/wide_room.yaml"/>-->
 
   <!-- Run the map server -->
   <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" output="screen"/>
