@@ -1,5 +1,5 @@
 /*
- * ********************************************************************************
+  *******************************************************************************
  * @file PI control pwm
  * @brief cmd_vel to pwm value
  * @author Ramune6110
@@ -9,7 +9,7 @@
  * Rotary encoder    | EC202A100A x 2
  * publish           | odom
  * sbscribe          | cmd_vel
- * ********************************************************************************
+  *******************************************************************************
 */
 /***********************************************************************
  * Header files 
@@ -54,10 +54,10 @@ ros::Subscriber<geometry_msgs::Twist>  cmd_vel_sub("cmd_vel", &cmd_vel_callback)
  **********************************************************************/
 //=========================================================
 // タイヤの半径
-const float wheel_radius = 0.0925f;
+const float wheel_radius = 0.095f;
 
 // 車輪間距離
-const float wheel_to_wheel_distance = 0.25f;
+const float wheel_to_wheel_distance = 0.310f;
 
 // 両車輪の移動速度
 float left_vel  = 0.0f;
@@ -74,13 +74,13 @@ float y     = 0.0f;
 float theta = 0.0f;
 
 //const double wheel_radius= 0.085;   // wr
-const float base_width = 0.236;    // ws
+const float base_width = 0.340;    // ws
 
 /***********************************************************************
  * Encoder variables
  **********************************************************************/
 //=========================================================
-/* 左側のモーター設定 */
+/ 左側のモーター設定 /
 BusIn encoder_bus_left(PC_11, PD_2); //Encoder (LSB to MSB)
 // モータードライバ
 DigitalOut IN1_left(PC_8);   //TA7291P IN1_left
@@ -88,13 +88,13 @@ DigitalOut IN2_left(PC_6);   //TA7291P IN2_left
 // モーター制御のためのPWM出力
 PwmOut motor_left(PC_9);     //TA7291P Vref
 
-/* 右側のモーター設定 */
-BusIn encoder_bus_right(PC_12, PD_2); //Encoder (LSB to MSB)
+/ 右側のモーター設定 /
+BusIn encoder_bus_right(PC_10, PC_12); //Encoder (LSB to MSB)
 // モータードライバ
-DigitalOut IN1_right(PC_2);   //TA7291P IN1_left
-DigitalOut IN2_right(PC_3);   //TA7291P IN2_left
+DigitalOut IN1_right(PB_8);   //TA7291P IN1_left
+DigitalOut IN2_right(PC_5);   //TA7291P IN2_left
 // モーター制御のためのPWM出力
-PwmOut motor_right(PC_4);     //TA7291P Vref
+PwmOut motor_right(PB_9);     //TA7291P Vref
 
 //=========================================================
 // タイマー割込み処理
@@ -151,8 +151,8 @@ float delta_speed_left  = 0.0f;
 float delta_speed_right = 0.0f;
 float i_left  = 0.0f;
 float i_right = 0.0f;
-float ki = 10.0;
-float kp = 1.0;
+float ki = 0.00001;
+float kp = 1;
 float motor_left_value  = 0.0f;
 float motor_right_value = 0.0f;
 
@@ -179,7 +179,7 @@ void rotary_encoder_check_right()
 {  
     static int code; 
     //check the movement
-    code = ( (code<<2) +  int(encoder_bus_left) ) & 0xf ;
+    code = ( (code<<2) +  int(encoder_bus_right) ) & 0xf ;
     //update the encoder value
     int value = -1 * table[code];
     encoder_value_right += value;
@@ -282,8 +282,8 @@ int main() {
         //-------------------------------------------
         // ロボットの位置
         //-------------------------------------------
-        x     = x + linear_vel * feedback_rate * cos(theta + angular_vel / 2.0f);
-        y     = y + linear_vel * feedback_rate * sin(theta + angular_vel / 2.0f);
+        x     = x + linear_vel  feedback_rate  cos(theta + angular_vel / 2.0f);
+        y     = y + linear_vel  feedback_rate  sin(theta + angular_vel / 2.0f);
         theta = theta + angular_vel * feedback_rate;
 
         //first, we'll publish the transform over tf
@@ -332,13 +332,14 @@ int main() {
         
         // P制御
         delta_speed_left  = cmdmotorspeed.data[0] - rotation_angular_velocity_left;
-        delta_speed_right = -cmdmotorspeed.data[1] - rotation_angular_velocity_left;
+//        delta_speed_right = -cmdmotorspeed.data[1] - rotation_angular_velocity_right;
+        delta_speed_right = cmdmotorspeed.data[1] - rotation_angular_velocity_right;
         // I制御
         i_left += delta_speed_left * feedback_rate;
         i_right += delta_speed_right * feedback_rate;
         // PI制御
-        motor_left_value  = kp * delta_speed_left + ki * i_left;
-        motor_right_value = kp * delta_speed_right + ki * i_right;
+        motor_left_value  = kp  delta_speed_left + ki  i_left;
+        motor_right_value = kp  delta_speed_right + ki  i_right;
         
         //offset
         if(motor_value > 0)
@@ -456,7 +457,7 @@ int main() {
             IN1_right = 1;
             IN2_right = 0;
             
-            motor_left.pulsewidth_us(pwm_width_right);
+            motor_right.pulsewidth_us(pwm_width_right);
             motor_direction_right = 1;
         }      
         //drive the motor in reverse
@@ -484,7 +485,7 @@ int main() {
             IN1_right = 0;
             IN2_right = 1;
 
-            motor_left.pulsewidth_us(pwm_width_right);
+            motor_right.pulsewidth_us(pwm_width_right);
             motor_direction_right = 2;          
         }
 
@@ -494,7 +495,6 @@ int main() {
 
         // wait 
         nh.spinOnce();  
-        wait(feedback_rate);
         wait_ms(1000);    
     }    
 }
