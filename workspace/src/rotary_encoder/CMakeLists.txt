@@ -22,3 +22,6 @@ include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
 )
+
+add_executable(cmdvel_cmdmotorspeed src/cmdvel_cmdmotorspeed.cpp)
+target_link_libraries(cmdvel_cmdmotorspeed ${catkin_LIBRARIES})
