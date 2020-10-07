@@ -17,12 +17,9 @@
  **********************************************************************/
 /* NUCLEO */
 #include "mbed.h"
-#include "math.h"
 
 /* ROS */
 #include <ros.h>
-#include <ros/time.h>
-#include <geometry_msgs/Twist.h>
 #include <std_msgs/Int32MultiArray.h>
 #include <std_msgs/Float32MultiArray.h>
 
@@ -32,9 +29,6 @@
 
 /* ROS communication*/
 ros::NodeHandle nh;
-
-std_msgs::Int32MultiArray encoder_data;
-ros::Publisher encoder_pub("encoder", &encoder_data);
 
 float motor_left_ref  = 0.0f;
 float motor_right_ref = 0.0f;
@@ -53,7 +47,11 @@ void rotation_vel_Cb(const std_msgs::Float32MultiArray& msg)
   rotation_angular_velocity_right = msg.data[1];
 }
 
-// cmdmotorspeed
+// publish
+std_msgs::Int32MultiArray encoder_data;
+ros::Publisher encoder_pub("encoder", &encoder_data);
+
+// subscribe
 ros::Subscriber<std_msgs::Float32MultiArray> cmdmotorspeed_sub("cmdmotorspeed", &motor_speed_Cb);
 ros::Subscriber<std_msgs::Float32MultiArray> rotation_angular_velocity_sub("rotation_angular_velocity", &rotation_vel_Cb);
 
@@ -114,8 +112,8 @@ float delta_speed_left  = 0.0f;
 float delta_speed_right = 0.0f;
 float i_left  = 0.0f;
 float i_right = 0.0f;
-float ki = 0.00001;
-float kp = 1;
+float ki = 0.00001f;
+float kp = 1.0f;
 float motor_left_value  = 0.0f;
 float motor_right_value = 0.0f;
 
@@ -151,14 +149,14 @@ void ros_init()
 {
     encoder_data.data_length = 2;
     encoder_data.data = (int32_t *)malloc(sizeof(int32_t)*2);
-    encoder_data.data[0] = 0;
-    encoder_data.data[1] = 0;
+    encoder_data.data[0] = 0.0f;
+    encoder_data.data[1] = 0.0f;
 
     nh.getHardware()->setBaud(57600);
     nh.initNode();
+    nh.advertise(encoder_pub);
     nh.subscribe(cmdmotorspeed_sub);
     nh.subscribe(rotation_angular_velocity_sub);
-    nh.advertise(encoder_pub);
 }
 
 /**
@@ -173,7 +171,6 @@ int main() {
     //-------------------------------------------
     // System initialization
     //-------------------------------------------
-    //pc.baud(115200);
     ros_init();
      
     //-------------------------------------------
@@ -201,11 +198,9 @@ int main() {
     */
     while(1)
     {
-        /**
-         ***********************************************************************
-         * Moter Control
-         ***********************************************************************
-        */
+        /**********************************************************************
+        * PI Moter Control
+        **********************************************************************/
         // P制御
         delta_speed_left  = motor_left_ref - rotation_angular_velocity_left;
         //delta_speed_right = -cmdmotorspeed.data[1] - rotation_angular_velocity_right;
