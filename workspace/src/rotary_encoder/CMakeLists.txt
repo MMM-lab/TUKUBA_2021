@@ -25,3 +25,12 @@ include_directories(
 
 add_executable(cmdvel_cmdmotorspeed src/cmdvel_cmdmotorspeed.cpp)
 target_link_libraries(cmdvel_cmdmotorspeed ${catkin_LIBRARIES})
+
+add_executable(odometry_publisher src/odometry_publisher.cpp)
+target_link_libraries(odometry_publisher ${catkin_LIBRARIES})
+
+#add_executable(Test src/Test.cpp)
+#target_link_libraries(Test ${catkin_LIBRARIES})
+
+#add_executable(Test2 src/Test2.cpp)
+#target_link_libraries(Test2 ${catkin_LIBRARIES})

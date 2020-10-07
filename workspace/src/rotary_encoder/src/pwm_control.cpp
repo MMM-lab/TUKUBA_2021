@@ -282,8 +282,8 @@ int main() {
         //-------------------------------------------
         // ロボットの位置
         //-------------------------------------------
-        x     = x + linear_vel  feedback_rate  cos(theta + angular_vel / 2.0f);
-        y     = y + linear_vel  feedback_rate  sin(theta + angular_vel / 2.0f);
+        x     = x + linear_vel * feedback_rate * cos(theta + angular_vel / 2.0f);
+        y     = y + linear_vel * feedback_rate * sin(theta + angular_vel / 2.0f);
         theta = theta + angular_vel * feedback_rate;
 
         //first, we'll publish the transform over tf
