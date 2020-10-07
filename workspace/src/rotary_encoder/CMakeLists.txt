@@ -34,3 +34,6 @@ target_link_libraries(odometry_publisher ${catkin_LIBRARIES})
 
 #add_executable(Test2 src/Test2.cpp)
 #target_link_libraries(Test2 ${catkin_LIBRARIES})
+
+add_executable(Test4 src/Test4.cpp)
+target_link_libraries(Test4 ${catkin_LIBRARIES})
