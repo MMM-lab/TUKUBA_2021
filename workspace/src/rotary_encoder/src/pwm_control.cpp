@@ -80,7 +80,7 @@ const float base_width = 0.340;    // ws
  * Encoder variables
  **********************************************************************/
 //=========================================================
-/ 左側のモーター設定 /
+/* 左側のモーター設定 */
 BusIn encoder_bus_left(PC_11, PD_2); //Encoder (LSB to MSB)
 // モータードライバ
 DigitalOut IN1_left(PC_8);   //TA7291P IN1_left
@@ -88,7 +88,7 @@ DigitalOut IN2_left(PC_6);   //TA7291P IN2_left
 // モーター制御のためのPWM出力
 PwmOut motor_left(PC_9);     //TA7291P Vref
 
-/ 右側のモーター設定 /
+/* 右側のモーター設定 */
 BusIn encoder_bus_right(PC_10, PC_12); //Encoder (LSB to MSB)
 // モータードライバ
 DigitalOut IN1_right(PB_8);   //TA7291P IN1_left
@@ -338,8 +338,8 @@ int main() {
         i_left += delta_speed_left * feedback_rate;
         i_right += delta_speed_right * feedback_rate;
         // PI制御
-        motor_left_value  = kp  delta_speed_left + ki  i_left;
-        motor_right_value = kp  delta_speed_right + ki  i_right;
+        motor_left_value  = kp * delta_speed_left + ki * i_left;
+        motor_right_value = kp * delta_speed_right + ki * i_right;
         
         //offset
         if(motor_value > 0)
