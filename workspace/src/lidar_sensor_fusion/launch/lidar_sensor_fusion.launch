@@ -1,0 +1,12 @@
+<launch>
+
+  <rosparam param="/use_sim_time">true</rosparam>
+
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find 2D_Navigation_Stack)/maps/MK_room.yaml"/>
+  <node pkg="tf" type="static_transform_publisher" name="link0" args="0 0 0 0 0 0 map laser 100" />
+  <node name="rosbag_play" pkg="rosbag" type="play" args="$(find lidar_sensor_fusion)/rosbag/2D_rplidar.bag -l --clock" />
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find lidar_sensor_fusion)/rviz/sensor_fusion.rviz" />
+  <include file="$(find ira_laser_tools)/launch/laserscan_multi_merger.launch" >
+  </include>
+
+</launch>
