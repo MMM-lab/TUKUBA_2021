@@ -7,3 +7,6 @@
 [submodule "workspace/src/magni_robot"]
 	path = workspace/src/magni_robot
 	url = https://github.com/MMM-lab/magni_robot
+[submodule "workspace/src/ira_laser_tools"]
+	path = workspace/src/ira_laser_tools
+	url = https://github.com/MMM-lab/ira_laser_tools
