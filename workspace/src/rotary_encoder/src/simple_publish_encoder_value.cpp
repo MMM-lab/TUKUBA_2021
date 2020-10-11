@@ -17,7 +17,6 @@
  **********************************************************************/
 /* NUCLEO */
 #include "mbed.h"
-#include "Serial.h"
 
 /* ROS */
 #include <ros.h>
@@ -29,8 +28,6 @@
 ros::NodeHandle  nh;
 std_msgs::Int32MultiArray encoder_data;
 ros::Publisher encoder_pub("encoder", &encoder_data);
-
-Serial pc(USBTX, USBRX); // tx, rx
 
 /***********************************************************************
  * Prototype declaration
@@ -213,10 +210,6 @@ int main() {
         } else if (pwm_width_left < 0 && pwm_width_right >= 0) {
             move_turn_left();
         }
-
-        // display encoder value
-        pc.printf("encoder_value_left = %d\r\n", encoder_value_left);
-        pc.printf("encoder_value_right = %d\r\n", encoder_value_right);
 
         // wait 
         wait_ms(10);    
