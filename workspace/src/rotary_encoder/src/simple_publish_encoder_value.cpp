@@ -111,9 +111,9 @@ void rotary_encoder_check()
     encoder_value_right += value_right;
 
     // 左右のエンコーダ値をpublishする
-    encoder_data.data[0] = encoder_value_left;
+    /*encoder_data.data[0] = encoder_value_left;
     encoder_data.data[1] = encoder_value_right; 
-    encoder_pub.publish(&encoder_data);
+    encoder_pub.publish(&encoder_data);*/
 }
 
 void encoder_init()
@@ -124,7 +124,7 @@ void encoder_init()
     encoder_data.data[0] = 0;
     encoder_data.data[1] = 0;
 
-    //nh.getHardware()->setBaud(230400);
+    nh.getHardware()->setBaud(230400);
     nh.initNode();
     //nh.subscribe(cmdmotorspeed_sub);
     nh.advertise(encoder_pub);
@@ -211,8 +211,14 @@ int main() {
             move_turn_left();
         }
 
+        __disable_irq();
+        encoder_data.data[0] = encoder_value_left;
+        encoder_data.data[1] = encoder_value_right; 
+        encoder_pub.publish(&encoder_data);
+        //nh.spinOnce();  
+        __enable_irq();
         // wait 
-        wait_ms(10);    
+        wait_ms(1000);    
     }    
 }
 
