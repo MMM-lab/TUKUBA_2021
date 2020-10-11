@@ -54,7 +54,7 @@ ros::Time current_time;
 // odom
 nav_msgs::Odometry odom;
 geometry_msgs::TransformStamped odom_trans;
-tf::TransformBroadcaster odom_broadcaster;
+//tf::TransformBroadcaster odom_broadcaster;
 
 // 制御周期
 float dt; //sec
@@ -156,6 +156,7 @@ int main(int argc, char** argv) {
     y     = y + linear_vel * dt * sin(theta + angular_vel / 2.0f);
     theta = theta + angular_vel * dt;
 
+    static tf::TransformBroadcaster odom_broadcaster;
     //since all odometry is 6DOF we'll need a quaternion created from yaw
     geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(theta);
 
