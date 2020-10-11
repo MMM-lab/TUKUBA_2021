@@ -29,6 +29,9 @@ target_link_libraries(cmdvel_cmdmotorspeed ${catkin_LIBRARIES})
 add_executable(odometry_publisher src/odometry_publisher.cpp)
 target_link_libraries(odometry_publisher ${catkin_LIBRARIES})
 
+add_executable(simple_publish_PWM_and_odom src/simple_publish_PWM_and_odom.cpp)
+target_link_libraries(simple_publish_PWM_and_odom ${catkin_LIBRARIES})
+
 #add_executable(Test src/Test.cpp)
 #target_link_libraries(Test ${catkin_LIBRARIES})
 
