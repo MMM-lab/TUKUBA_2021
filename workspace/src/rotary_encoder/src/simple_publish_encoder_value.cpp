@@ -214,7 +214,7 @@ int main() {
         __disable_irq();
         encoder_data.data[0] = encoder_value_left;
         encoder_data.data[1] = encoder_value_right; 
-        encoder_pub.publish(&encoder_data);
+        encoder_pub.publish(encoder_data);
         //nh.spinOnce();  
         __enable_irq();
         // wait 
