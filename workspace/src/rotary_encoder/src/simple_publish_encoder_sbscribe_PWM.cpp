@@ -20,6 +20,7 @@
 
 /* ROS */
 #include <ros.h>
+#include <std_msgs/Int8MultiArray.h>
 #include <std_msgs/Int32MultiArray.h>
 
 /* ROS */
@@ -33,13 +34,21 @@ ros::Publisher encoder_pub("encoder", &encoder_data);
 // PWM出力のパルス幅(0~100で指定する)
 int pwm_width_left;
 int pwm_width_right;
-void motor_speed_Cb(const std_msgs::Int32MultiArray& msg)
+/*void motor_speed_Cb(const std_msgs::Int32MultiArray& msg)
 {
   pwm_width_left  = msg.data[0];
   pwm_width_right = msg.data[1];
 }
 
-ros::Subscriber<std_msgs::Int32MultiArray> cmdmotorspeed_sub("cmdmotorspeed", &motor_speed_Cb);
+ros::Subscriber<std_msgs::Int32MultiArray> cmdmotorspeed_sub("cmdmotorspeed", &motor_speed_Cb);*/
+
+void motor_speed_Cb(const std_msgs::Int8MultiArray& msg)
+{
+  pwm_width_left  = msg.data[0];
+  pwm_width_right = msg.data[1];
+}
+
+ros::Subscriber<std_msgs::Int8MultiArray> cmdmotorspeed_sub("cmdmotorspeed", &motor_speed_Cb);
 
 /***********************************************************************
  * Prototype declaration
