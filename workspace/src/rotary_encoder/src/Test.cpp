@@ -230,8 +230,8 @@ int main(int argc, char** argv) {
     //calculate PWM pulse width
     pwm_width_left  = int(motor_left_value * 100.0f / 3.3f );
     pwm_width_right = int(motor_right_value * 100.0f / 3.3f );
-    pwm_width_data.data[0] = pwm_width_left;
-    pwm_width_data.data[1] = pwm_width_right;
+    pwm_width_data.data[0] = 50;
+    pwm_width_data.data[1] = 50;
 
     //publish the message
     odom_pub.publish(odom);
