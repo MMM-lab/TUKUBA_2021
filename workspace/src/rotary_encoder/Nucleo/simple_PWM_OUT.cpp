@@ -175,8 +175,8 @@ int main() {
     while(1)
     {
         //calculate PWM pulse width
-        pwm_width_left  = int(motor_left_value * 100.0f / 3.3f );
-        pwm_width_right = int(motor_right_value * 100.0f / 3.3f );
+        pwm_width_left  = int(motor_left_ref * 100.0f / 3.3f );
+        pwm_width_right = int(motor_right_ref * 100.0f / 3.3f );
 
         //over voltage
         if(pwm_width_left > 100)
