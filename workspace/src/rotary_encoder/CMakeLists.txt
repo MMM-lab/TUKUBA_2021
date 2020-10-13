@@ -48,3 +48,6 @@ target_link_libraries(Test4 ${catkin_LIBRARIES})
 add_executable(serial_test_node src/serial_test_v1.cpp)
 #add_dependencies(serial_test_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(serial_test_node ${catkin_LIBRARIES})
+
+add_executable(simple_cmd_vel_publish src/simple_cmd_vel_publish.cpp)
+target_link_libraries(simple_cmd_vel_publish ${catkin_LIBRARIES})
