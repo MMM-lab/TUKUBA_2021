@@ -178,19 +178,108 @@ int main() {
         pwm_width_left  = int(motor_left_ref * 100.0f / 3.3f );
         pwm_width_right = int(motor_right_ref * 100.0f / 3.3f );
 
-        //over voltage
-        if(pwm_width_left > 100)
+        /***********************************************************************
+        * left moter PWM
+        **********************************************************************/
+        //drive the motor in forward
+        if(pwm_width_left>=0)
         {
-            pwm_width_left = 100;    
-        }    
-        if(pwm_width_right > 100)
+            //over voltage
+            if(pwm_width_left>100)
+            {
+                pwm_width_left = 100;    
+            }         
+            //to protect TA7291P
+            if(motor_direction_left == 2)
+            {
+                IN1_left = 0;
+                IN2_left = 0;
+                wait(0.0001); //wait 100 usec    
+            }        
+            //forward
+            IN1_left = 1;
+            IN2_left = 0;
+            
+            motor_left.pulsewidth_us(pwm_width_left);
+            motor_direction_left = 1;
+        }      
+        //drive the motor in reverse
+        else
         {
-            pwm_width_right = 100;    
-        }         
+            //calculate the absolute value
+            pwm_width_left = -1 * pwm_width_left;
 
-        motor_left.pulsewidth_us(pwm_width_left);
-        motor_right.pulsewidth_us(pwm_width_right);
+            //over voltage
+            if(pwm_width_left>100)
+            {
+                pwm_width_left = 100;    
+            }
+            //to protect TA7291P
+            if(motor_direction_left == 1)
+            {
+                IN1_left = 0;
+                IN2_left = 0;
+                wait(0.0001); //wait 100 usec    
+            }
+            //reverse
+            IN1_left = 0;
+            IN2_left = 1;
 
+            motor_left.pulsewidth_us(pwm_width_left);
+            motor_direction_left = 2;          
+        }
+
+        /***********************************************************************
+        * right moter PWM
+        **********************************************************************/
+        //drive the motor in forward
+        if(pwm_width_right>=0)
+        {
+            //over voltage
+            if(pwm_width_right>100)
+            {
+                pwm_width_right = 100;    
+            }         
+            //to protect TA7291P
+            if(motor_direction_right == 2)
+            {
+                IN1_right = 0;
+                IN2_right = 0;
+                wait(0.0001); //wait 100 usec    
+            }        
+            //forward
+            IN1_right = 1;
+            IN2_right = 0;
+            
+            motor_right.pulsewidth_us(pwm_width_right);
+            motor_direction_right = 1;
+        }      
+        //drive the motor in reverse
+        else
+        {
+            //calculate the absolute value
+            pwm_width_right = -1 * pwm_width_right;
+
+            //over voltage
+            if(pwm_width_right>100)
+            {
+                pwm_width_right = 100;    
+            }
+            //to protect TA7291P
+            if(motor_direction_right == 1)
+            {
+                IN1_right = 0;
+                IN2_right = 0;
+                wait(0.0001); //wait 100 usec    
+            }
+            //reverse
+            IN1_right = 0;
+            IN2_right = 1;
+
+            motor_right.pulsewidth_us(pwm_width_right);
+            motor_direction_right = 2;          
+        }
+        
         nh.spinOnce();  
         wait_ms(10);    
     }    
