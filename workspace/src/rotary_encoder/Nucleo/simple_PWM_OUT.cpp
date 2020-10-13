@@ -175,7 +175,7 @@ int main() {
     // Timer
     //-------------------------------------------  
     //timer_left: rotary encoder polling, 40 kHz
-    //timer_encoder.attach_us(&rotary_encoder_check, rotary_encoder_update_rate);
+    timer_encoder.attach_us(&rotary_encoder_check, rotary_encoder_update_rate);
     
     /**
      ***********************************************************************
