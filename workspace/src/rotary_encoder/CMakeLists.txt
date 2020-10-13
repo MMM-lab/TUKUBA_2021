@@ -54,3 +54,6 @@ target_link_libraries(simple_cmd_vel_publish ${catkin_LIBRARIES})
 
 add_executable(simple_cmd_Int_publish src/simple_cmd_Int_publish.cpp)
 target_link_libraries(simple_cmd_Int_publish ${catkin_LIBRARIES})
+
+add_executable(simple_odom_publisher src/simple_odom_publisher.cpp)
+target_link_libraries(simple_odom_publisher ${catkin_LIBRARIES})
