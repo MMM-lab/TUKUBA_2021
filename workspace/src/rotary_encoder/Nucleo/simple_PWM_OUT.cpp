@@ -43,6 +43,10 @@ void motor_speed_Cb(const std_msgs::Int16MultiArray& msg)
 
 ros::Subscriber<std_msgs::Int16MultiArray> cmdmotorspeed_sub("cmdmotorspeed", &motor_speed_Cb);
 
+// publish
+std_msgs::Int16MultiArray test_data;
+ros::Publisher test_pub("test", &test_data);
+
 /***********************************************************************
  * Encoder variables
  **********************************************************************/
@@ -130,8 +134,14 @@ void rotary_encoder_check()
 
 void ros_init()
 {
+    test_data.data_length = 2;
+    test_data.data = (int16_t *)malloc(sizeof(int16_t)*2);
+    test_data.data[0] = 0;
+    test_data.data[1] = 0;
+
     nh.getHardware()->setBaud(115200);
     nh.initNode();
+    nh.advertise(test_pub);
     nh.subscribe(cmdmotorspeed_sub);
 }
 
@@ -279,7 +289,12 @@ int main() {
             motor_right.pulsewidth_us(pwm_width_right);
             motor_direction_right = 2;          
         }
-        
+
+        // encoder publish
+        test_data.data[0] = (int) motor_left_ref * 10;
+        test_data.data[1] = (int) motor_right_ref * 10; 
+        test_pub.publish(&test_data);
+
         nh.spinOnce();  
         wait_ms(10);    
     }    
