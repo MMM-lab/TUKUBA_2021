@@ -175,7 +175,7 @@ int main() {
     // Timer
     //-------------------------------------------  
     //timer_left: rotary encoder polling, 40 kHz
-    timer_encoder.attach_us(&rotary_encoder_check, rotary_encoder_update_rate);
+    //timer_encoder.attach_us(&rotary_encoder_check, rotary_encoder_update_rate);
     
     /**
      ***********************************************************************
@@ -184,6 +184,18 @@ int main() {
     */
     while(1)
     {
+        static int code_left; 
+        static int code_right; 
+        //check the movement
+        code_left  = ( (code_left<<2) + int(encoder_bus_left) ) & 0xf ;
+        code_right = ( (code_right<<2) + int(encoder_bus_right) ) & 0xf ;
+        //update the encoder value
+        int value_left  = -1 * table[code_left];
+        int value_right = -1 * table[code_right];
+
+        encoder_value_left += value_left;
+        encoder_value_right += value_right;
+
         //calculate PWM pulse width
         pwm_width_left  = int(motor_left_ref * 100.0f / 3.3f );
         pwm_width_right = int(motor_right_ref * 100.0f / 3.3f );
@@ -291,8 +303,8 @@ int main() {
         }
 
         // encoder publish
-        test_data.data[0] = (int) motor_left_ref * 10;
-        test_data.data[1] = (int) motor_right_ref * 10; 
+        test_data.data[0] = encoder_value_left;
+        test_data.data[1] = encoder_value_right; 
         test_pub.publish(&test_data);
 
         nh.spinOnce();  
