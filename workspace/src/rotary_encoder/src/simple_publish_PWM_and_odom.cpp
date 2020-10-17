@@ -2,6 +2,7 @@
 #include <nav_msgs/Odometry.h>
 #include <tf/transform_broadcaster.h>
 #include <geometry_msgs/Twist.h>
+#include <std_msgs/Int8MultiArray.h>
 #include <std_msgs/Int32MultiArray.h>
 #include <std_msgs/Float32MultiArray.h>
 
@@ -62,7 +63,8 @@ float dt; //sec
 // PWM出力のパルス幅(0~100で指定する)
 int pwm_width_left;
 int pwm_width_right;
-std_msgs::Int32MultiArray pwm_width_data;
+//std_msgs::Int32MultiArray pwm_width_data;
+std_msgs::Int8MultiArray pwm_width_data;
 
 // モーター出力電圧に加えるオフセット値(摩擦トルクを相殺するために用いる)
 float motor_offset = 0.17; //volt
@@ -81,9 +83,16 @@ float motor_right_value;
  * Callback function
  **********************************************************************/
 
-void cmd_vel_callback(const geometry_msgs::Twist& msg) {
+// 参考資料 : https://hajimerobot.co.jp/ros/robotcart/
+/*void cmd_vel_callback(const geometry_msgs::Twist& msg) {
   rotation_angular_velocity_left  = (msg.linear.x - msg.angular.z * base_width / 2.0) / wheel_radius;    // left motor [rad/s]
   rotation_angular_velocity_right = (msg.linear.x + msg.angular.z * base_width / 2.0) / wheel_radius;    // right motor [rad/s]
+}*/
+
+// 参考資料 : https://at-wat.github.io/ROS-quick-start-up/files/Vehicle_and_Motion_Control.pdf
+void cmd_vel_callback(const geometry_msgs::Twist& msg) {
+  rotation_angular_velocity_left  = (2 * msg.linear.x - msg.angular.z * base_width) / (2 * wheel_radius);    // left motor [rad/s]
+  rotation_angular_velocity_right = (2 * msg.linear.x + msg.angular.z * base_width) / (2 * wheel_radius);    // right motor [rad/s]
 }
 
 void encoderCallback(const std_msgs::Int32MultiArray::ConstPtr& msg)
@@ -107,7 +116,8 @@ int main(int argc, char** argv) {
 
   // publisher
   odom_pub = nh.advertise<nav_msgs::Odometry>("odom", 10);
-  cmdmotorspeed_pub = nh.advertise<std_msgs::Int32MultiArray>("cmdmotorspeed", 10);
+  //cmdmotorspeed_pub = nh.advertise<std_msgs::Int32MultiArray>("cmdmotorspeed", 10);
+  cmdmotorspeed_pub = nh.advertise<std_msgs::Int8MultiArray>("cmdmotorspeed", 10);
 
   // sbscriber
   ros::Subscriber encoder_sub = nh.subscribe("encoder", 10, encoderCallback);
