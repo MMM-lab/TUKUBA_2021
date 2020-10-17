@@ -156,7 +156,8 @@ int main(int argc, char** argv) {
   while (ros::ok()) {
     current_time = ros::Time::now();
 
-    dt = (current_time - last_time).toSec();
+    //dt = (current_time - last_time).toSec();
+    dt = 0.1;
 
     /**
     ***********************************************************************
