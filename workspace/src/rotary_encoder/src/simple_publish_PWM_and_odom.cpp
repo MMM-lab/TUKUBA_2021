@@ -60,14 +60,33 @@ geometry_msgs::TransformStamped odom_trans;
 // 制御周期
 float dt; //sec
 
+/***********************************************************************
+ * Moter Control variables
+ **********************************************************************/
+// 目標トルク
+float target_left_torque;
+float target_right_torque;
+// 目標電流
+float target_left_electric_current;
+float target_right_electric_current;
+// 慣性モーメント(本体とモータとタイヤ全体の慣性モーメントを求める)
+float I = 10.0;
+// ギア比(減速比)
+float ita = 64.8;
+// モーターの回転速度
+float omega_left;
+float omega_right;
+// モータのトルク定数
+float kt = 0.0018;
+// モーターの逆起電力定数
+float kb = 0.0024;
+// 回路全体の抵抗
+float R = 2.4;
+
 // PWM出力のパルス幅(0~100で指定する)
 int pwm_width_left;
 int pwm_width_right;
-//std_msgs::Int32MultiArray pwm_width_data;
 std_msgs::Int8MultiArray pwm_width_data;
-
-// モーター出力電圧に加えるオフセット値(摩擦トルクを相殺するために用いる)
-float motor_offset = 0.17; //volt
 
 // 左右のモータへの電圧
 float delta_speed_left;
@@ -79,9 +98,14 @@ float kp = 1;
 float motor_left_value;
 float motor_right_value;
 
+// モーター出力電圧に加えるオフセット値(摩擦トルクを相殺するために用いる)
+float motor_offset = 0.17; //volt
+
 /***********************************************************************
  * Callback function
  **********************************************************************/
+float target_rotation_angular_velocity_left;
+float target_rotation_angular_velocity_right;
 
 // 参考資料 : https://hajimerobot.co.jp/ros/robotcart/
 /*void cmd_vel_callback(const geometry_msgs::Twist& msg) {
@@ -91,8 +115,8 @@ float motor_right_value;
 
 // 参考資料 : https://at-wat.github.io/ROS-quick-start-up/files/Vehicle_and_Motion_Control.pdf
 void cmd_vel_callback(const geometry_msgs::Twist& msg) {
-  rotation_angular_velocity_left  = (2 * msg.linear.x - msg.angular.z * base_width) / (2 * wheel_radius);    // left motor [rad/s]
-  rotation_angular_velocity_right = (2 * msg.linear.x + msg.angular.z * base_width) / (2 * wheel_radius);    // right motor [rad/s]
+  target_rotation_angular_velocity_left  = (2 * msg.linear.x - msg.angular.z * base_width) / (2 * wheel_radius);    // left motor [rad/s]
+  target_rotation_angular_velocity_right = (2 * msg.linear.x + msg.angular.z * base_width) / (2 * wheel_radius);    // right motor [rad/s]
 }
 
 void encoderCallback(const std_msgs::Int32MultiArray::ConstPtr& msg)
@@ -204,7 +228,7 @@ int main(int argc, char** argv) {
     ***********************************************************************
     */
     
-    // P制御
+    /*// P制御
     delta_speed_left  = rotation_angular_velocity_left - rotation_angular_velocity_left;
     delta_speed_right = rotation_angular_velocity_right - rotation_angular_velocity_right;
     // I制御
@@ -212,9 +236,34 @@ int main(int argc, char** argv) {
     i_right += delta_speed_right * dt;
     // PI制御
     motor_left_value  = kp * delta_speed_left + ki * i_left;
-    motor_right_value = kp * delta_speed_right + ki * i_right;
-    
-    // motor_left_value
+    motor_right_value = kp * delta_speed_right + ki * i_right;*/
+
+    //-------------------------------------------
+    // PI制御でモータのトルク制御
+    //-------------------------------------------
+    // P制御
+    delta_speed_left  = target_rotation_angular_velocity_left - rotation_angular_velocity_left;
+    delta_speed_right = target_rotation_angular_velocity_right - rotation_angular_velocity_right;
+    // I制御
+    i_left += delta_speed_left * dt;
+    i_right += delta_speed_right * dt;
+    // PI制御
+    target_left_torque  = kp * I * delta_speed_left + ki * I * i_left;
+    target_right_torque = kp * I * delta_speed_right + ki * I * i_right;
+
+    //-------------------------------------------
+    // 電圧のPWM変換
+    //-------------------------------------------
+    // 電流の計算
+    target_left_electric_current  = target_left_torque / kt;
+    target_right_electric_current = target_right_torque / kt;
+    // モータの回転速度の計算
+    omega_left  = ita * rotation_angular_velocity_left;
+    omega_right = ita * rotation_angular_velocity_right;
+    // 電圧の計算
+    motor_left_value  = R * target_left_electric_current + kb * omega_left;
+    motor_right_value = R * target_right_electric_current + kb * omega_right;
+    // オフセット値を足す
     if(motor_left_value > 0)
     {
         motor_left_value += motor_offset;   
@@ -223,8 +272,6 @@ int main(int argc, char** argv) {
     {
         motor_left_value -= motor_offset;    
     }
-
-    // motor_right_value
     if(motor_right_value > 0)
     {
         motor_right_value += motor_offset;   
@@ -233,7 +280,6 @@ int main(int argc, char** argv) {
     {
         motor_right_value -= motor_offset;    
     }
-    
     //calculate PWM pulse width
     pwm_width_left  = int(motor_left_value * 100.0f / 3.3f );
     pwm_width_right = int(motor_right_value * 100.0f / 3.3f );
