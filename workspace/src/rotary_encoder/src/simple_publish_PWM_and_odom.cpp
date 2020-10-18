@@ -69,8 +69,8 @@ float target_right_torque;
 // 目標電流
 float target_left_electric_current;
 float target_right_electric_current;
-// 慣性モーメント(本体とモータとタイヤ全体の慣性モーメントを求める)
-float I = 10.0;
+// 慣性モーメント(本体とモータとタイヤ全体の慣性モーメントを求める)                                                                                                                                                               
+float I = 0.06768;
 // ギア比(減速比)
 float ita = 64.8;
 // モーターの回転速度
