@@ -1,8 +1,22 @@
+/*
+  *******************************************************************************
+ * @file PI control pwm
+ * @brief sub encoder pub PWM
+ * @author Ramune6110
+ * @date 2020 10/23
+ * SYSTEM            | NUCLEO-F401RE
+ * Motor driver      | TA7291P x 2
+ * Rotary encoder    | EC202A100A x 2
+ * publish           | encoder
+ * sbscribe          | cmdmotorspeed(PWM value)
+  *******************************************************************************
+*/
 #include <ros/ros.h>
 #include <nav_msgs/Odometry.h>
 #include <tf/transform_broadcaster.h>
 #include <geometry_msgs/Twist.h>
 #include <std_msgs/Int8MultiArray.h>
+#include <std_msgs/Int16MultiArray.h>
 #include <std_msgs/Int32MultiArray.h>
 #include <std_msgs/Float32MultiArray.h>
 
@@ -119,7 +133,7 @@ void cmd_vel_callback(const geometry_msgs::Twist& msg) {
   target_rotation_angular_velocity_right = (2 * msg.linear.x + msg.angular.z * base_width) / (2 * wheel_radius);    // right motor [rad/s]
 }
 
-void encoderCallback(const std_msgs::Int32MultiArray::ConstPtr& msg)
+void encoderCallback(const std_msgs::Int16MultiArray::ConstPtr& msg)
 {
     encoder_value_left  = msg->data[0];
     encoder_value_right = msg->data[1];

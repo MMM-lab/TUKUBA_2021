@@ -43,7 +43,7 @@ ros::Subscriber<std_msgs::Int8MultiArray> cmdmotorspeed_sub("cmdmotorspeed", &mo
 
 // publish
 std_msgs::Int16MultiArray encoder_data;
-ros::Publisher encoder_pub("test", &encoder_data);
+ros::Publisher encoder_pub("encoder", &encoder_data);
 
 /***********************************************************************
  * Encoder variables
