@@ -131,8 +131,9 @@ int main() {
         code_right = ( (code_right<<2) + int(encoder_bus_right) ) & 0xf ;
         //update the encoder value
         int value_left  = -1 * table[code_left];
-        int value_right = -1 * table[code_right];
-
+        //int value_right = -1 * table[code_right];
+        int value_right = table[code_right];
+        
         encoder_value_left += value_left;
         encoder_value_right += value_right;
 
