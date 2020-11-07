@@ -298,6 +298,25 @@ int main(int argc, char** argv) {
     //calculate PWM pulse width
     pwm_width_left  = int(motor_left_value * 100.0f / 3.3f );
     pwm_width_right = int(motor_right_value * 100.0f / 3.3f );
+
+    // サチュレーション
+    if(pwm_width_left > 100)
+    {
+        pwm_width_left = 100;
+    }
+    if(pwm_width_left < 0)
+    {
+        pwm_width_left = 0;  
+    }
+    if(pwm_width_right > 100)
+    {
+        pwm_width_right = 100;
+    }
+    if(pwm_width_right < 0)
+    {
+        pwm_width_right = 0;  
+    }
+
     pwm_width_data.data[0] = pwm_width_left;
     pwm_width_data.data[1] = pwm_width_right;
 
