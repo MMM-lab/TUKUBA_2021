@@ -165,13 +165,13 @@ int main(int argc, char** argv) {
   last_time    = ros::Time::now();
   current_time = ros::Time::now();
 
-  ros::Rate loop_rate(10);	//10Hz(10ms)
+  ros::Rate loop_rate(100);	//10Hz(10ms)
 
   while (ros::ok()) {
     current_time = ros::Time::now();
 
-    //dt = (current_time - last_time).toSec();
-    dt = 0.1;
+    dt = (current_time - last_time).toSec();
+    //dt = 0.1;
 
     /**
     ***********************************************************************
