@@ -113,8 +113,8 @@ float d_right;
 float i_left;
 float i_right;
 // ゲイン調整
-float KP_Left  = 20.0;
-float KP_right = 20.0;
+float KP_Left  = 22.0;
+float KP_right = 22.0;
 float ki_left  = 0.0001;
 float ki_right = 0.0001;
 float kp_left  = 0.0;
