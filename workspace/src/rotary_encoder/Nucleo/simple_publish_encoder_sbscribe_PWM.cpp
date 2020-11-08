@@ -3,7 +3,7 @@
  * @file PI control pwm
  * @brief sub encoder pub PWM
  * @author Ramune6110
- * @date 2020 10/23
+ * @date 2020 11/08
  * SYSTEM            | NUCLEO-F401RE
  * Motor driver      | TA7291P x 2
  * Rotary encoder    | EC202A100A x 2
@@ -21,6 +21,7 @@
 #include <ros.h>
 #include <std_msgs/Int8MultiArray.h>
 #include <std_msgs/Int16MultiArray.h>
+#include <std_msgs/Int64MultiArray.h>
 
 /***********************************************************************
  * Global variables
@@ -42,7 +43,7 @@ void motor_speed_Cb(const std_msgs::Int8MultiArray& msg)
 ros::Subscriber<std_msgs::Int8MultiArray> cmdmotorspeed_sub("cmdmotorspeed", &motor_speed_Cb);
 
 // publish
-std_msgs::Int16MultiArray encoder_data;
+std_msgs::Int64MultiArray encoder_data;
 ros::Publisher encoder_pub("encoder", &encoder_data);
 
 /***********************************************************************
@@ -81,7 +82,7 @@ int motor_direction_right = 1;
 void ros_init()
 {
     encoder_data.data_length = 2;
-    encoder_data.data = (int16_t *)malloc(sizeof(int16_t)*2);
+    encoder_data.data = (int64_t *)malloc(sizeof(int64_t)*2);
     encoder_data.data[0] = 0;
     encoder_data.data[1] = 0;
 

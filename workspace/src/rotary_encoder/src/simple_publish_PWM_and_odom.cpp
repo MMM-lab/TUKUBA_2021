@@ -3,7 +3,7 @@
  * @file PI control pwm
  * @brief sub encoder pub PWM
  * @author Ramune6110
- * @date 2020 10/23
+ * @date 2020 11/08
  * SYSTEM            | NUCLEO-F401RE
  * Motor driver      | TA7291P x 2
  * Rotary encoder    | EC202A100A x 2
@@ -18,29 +18,30 @@
 #include <std_msgs/Int8MultiArray.h>
 #include <std_msgs/Int16MultiArray.h>
 #include <std_msgs/Int32MultiArray.h>
+#include <std_msgs/Int64MultiArray.h>
 #include <std_msgs/Float32MultiArray.h>
 
 /***********************************************************************
  * Global variables
  **********************************************************************/
 // HajimeCart parameter
-const double wheel_radius           = 0.095f;   
-const double base_width             = 0.340f; 
+const float wheel_radius            = 0.0612f;   
+const float base_width              = 0.340f; 
 const float wheel_to_wheel_distance = 0.310f;
 
 // ロータリーエンコーダの1回転あたりのパルス数
 int rotary_encoder_resolution = 100;
 
 // ロータリーエンコーダの回転数を保持. 1回転で400増加
-int encoder_value_left;
-int encoder_value_right;
+int64_t encoder_value_left;
+int64_t encoder_value_right;
 
 // 現時刻でのロータリーエンコーダの角度を保持
 float rotation_angle_left;
 float rotation_angle_right;
 
 // 前時刻でのロータリーエンコーダの角度を保持
-float pre_rotation_angle_left = 0.0f;
+float pre_rotation_angle_left  = 0.0f;
 float pre_rotation_angle_right = 0.0f;
 
 // 現時刻でのロータリーエンコーダの角速度を保持
@@ -105,10 +106,21 @@ std_msgs::Int8MultiArray pwm_width_data;
 // 左右のモータへの電圧
 float delta_speed_left;
 float delta_speed_right;
+float pre_delta_speed_left;
+float pre_delta_speed_right;
+float d_left;
+float d_right;
 float i_left;
 float i_right;
-float ki = 0.00001;
-float kp = 1;
+// ゲイン調整
+float KP_Left  = 20.0;
+float KP_right = 20.0;
+float ki_left  = 0.0001;
+float ki_right = 0.0001;
+float kp_left  = 0.0;
+float kp_right = 0.0;
+float kd_left  = 0.0;
+float kd_right = 0.0;
 float motor_left_value;
 float motor_right_value;
 
@@ -133,7 +145,7 @@ void cmd_vel_callback(const geometry_msgs::Twist& msg) {
   target_rotation_angular_velocity_right = (2 * msg.linear.x + msg.angular.z * base_width) / (2 * wheel_radius);    // right motor [rad/s]
 }
 
-void encoderCallback(const std_msgs::Int16MultiArray::ConstPtr& msg)
+void encoderCallback(const std_msgs::Int64MultiArray::ConstPtr& msg)
 {
     encoder_value_left  = msg->data[0];
     encoder_value_right = msg->data[1];
@@ -181,14 +193,14 @@ int main(int argc, char** argv) {
     //-------------------------------------------
     // タイヤの回転角
     //-------------------------------------------
-    rotation_angle_left  = encoder_value_left * (2 * 3.14f)/(4 * rotary_encoder_resolution);
-    rotation_angle_right = encoder_value_right * (2 * 3.14f)/(4 * rotary_encoder_resolution);
+    rotation_angle_left  = (float) encoder_value_left * (2.0f * 3.14f)/(4.0f * (float) rotary_encoder_resolution);
+    rotation_angle_right = (float) encoder_value_right * (2.0f * 3.14f)/(4.0f * (float) rotary_encoder_resolution);
 
     //-------------------------------------------
     // タイヤの回転速度
     //-------------------------------------------
-    rotation_angular_velocity_left  = (rotation_angle_left - pre_rotation_angle_left) / dt;
-    rotation_angular_velocity_right = (rotation_angle_right - pre_rotation_angle_right) / dt;
+    rotation_angular_velocity_left  = (rotation_angle_left - pre_rotation_angle_left) / dt * 6.0f;
+    rotation_angular_velocity_right = (rotation_angle_right - pre_rotation_angle_right) / dt * 6.0f;
 
     //-------------------------------------------
     // ロボットの移動速度
@@ -259,12 +271,23 @@ int main(int argc, char** argv) {
     // P制御
     delta_speed_left  = target_rotation_angular_velocity_left - rotation_angular_velocity_left;
     delta_speed_right = target_rotation_angular_velocity_right - rotation_angular_velocity_right;
-    // I制御
+    
+    ROS_INFO("target left %f", target_rotation_angular_velocity_left);
+    ROS_INFO("target right %f", target_rotation_angular_velocity_right);
+    ROS_INFO("moter left %f", rotation_angular_velocity_left);
+    ROS_INFO("moter right %f", rotation_angular_velocity_right);
+
+    // I制御  
     i_left += delta_speed_left * dt;
     i_right += delta_speed_right * dt;
+
+    // D制御
+    d_left  = (delta_speed_left - pre_delta_speed_left) / dt;
+    d_right = (delta_speed_right - pre_delta_speed_right) / dt;
+
     // PI制御
-    target_left_torque  = kp * I * delta_speed_left + ki * I * i_left;
-    target_right_torque = kp * I * delta_speed_right + ki * I * i_right;
+    target_left_torque  = kp_left * I * delta_speed_left + ki_left * I * i_left + kd_left * I * d_left;
+    target_right_torque = kp_right * I * delta_speed_right + ki_right * I * i_right + kd_right * I * d_right;
 
     //-------------------------------------------
     // 電圧のPWM変換
@@ -300,7 +323,7 @@ int main(int argc, char** argv) {
     pwm_width_right = int(motor_right_value * 100.0f / 3.3f );
 
     // サチュレーション
-    if(pwm_width_left > 100)
+    /*if(pwm_width_left > 100)
     {
         pwm_width_left = 100;
     }
@@ -314,8 +337,14 @@ int main(int argc, char** argv) {
     }
     if(pwm_width_right < 0)
     {
-        pwm_width_right = 0;  
-    }
+        pwm_width_right = 0;
+    }*/
+    
+    //pwm_width_left  = 50;
+    //pwm_width_right = 50;
+
+    pwm_width_left  = KP_Left * target_rotation_angular_velocity_left;
+    pwm_width_right = KP_right * target_rotation_angular_velocity_right;
 
     pwm_width_data.data[0] = pwm_width_left;
     pwm_width_data.data[1] = pwm_width_right;
@@ -325,6 +354,11 @@ int main(int argc, char** argv) {
     cmdmotorspeed_pub.publish(pwm_width_data);
 
     last_time = current_time;
+
+    pre_rotation_angle_left  =  rotation_angle_left;
+    pre_rotation_angle_right = rotation_angle_right;
+    pre_delta_speed_left  = delta_speed_left;
+    pre_delta_speed_right = delta_speed_right;
 
     ros::spinOnce();
     loop_rate.sleep();
