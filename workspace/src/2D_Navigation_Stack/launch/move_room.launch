@@ -1,30 +1,37 @@
-<?xml version="1.0"?>
 <launch>
+  <!-- Arguments -->
+  <!--<arg name="map_file" default="$(find 2D_Navigation_Stack)/maps/room_ok.yaml"/>-->
+  <arg name="map_file" default="$(find 2D_Navigation_Stack)/maps/mymap.yaml"/>
+  <!--<arg name="map_file" default="$(find 2D_Navigation_Stack)/maps/wide_room.yaml"/>-->
+
   <!-- Run the map server -->
-  <node name="map_server" pkg="map_server" type="map_server" args="$(find 2D_Navigation_Stack)/maps/MK_room.yaml" output="screen"/>
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" output="screen"/>
 
-  <!-- Run lidar-->
-  <include file="$(find 2D_Navigation_Stack)/launch/rplidar_map.launch" >
-  </include> 
+  <!-- Run LiDAR-->
+  <node name="rplidarNode"          pkg="rplidar_ros"  type="rplidarNode" output="screen">
+    <param name="serial_port"         type="string" value="/dev/ttyUSB0"/>
+    <param name="serial_baudrate"     type="int"    value="115200"/><!--A1/A2 -->
+    <!--param name="serial_baudrate"     type="int"    value="256000"--><!--A3 -->
+    <param name="frame_id"            type="string" value="laser"/>
+    <param name="inverted"            type="bool"   value="false"/>
+    <param name="angle_compensate"    type="bool"   value="true"/>
+    <param name="scan_mode"        type="string" value="Standard"/>
+  </node>
 
-  <node pkg="tf" type="static_transform_publisher" name="link1" args="0 0 0 0 0 0 base_link laser 100" />
+  <!-- AMCL -->
+  <include file="$(find 2D_Navigation_Stack)/launch/amcl.launch"/>
 
-  <!-- Run amcl -->
-  <include file="$(find 2D_Navigation_Stack)/launch/amcl.launch" >
-  </include>
-    
+  <!-- move_base -->  
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
-    <param name="controller_frequency" value="10.0"/>
-    <param name="controller_patiente" value="15.0"/>
-    <param name="xy_goal_tolerance" value='0.50'/> 
-    <param name="yaw_goal_tolerance" value='0.15'/>
+    <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
     <rosparam file="$(find 2D_Navigation_Stack)/launch/costmap_common_params.yaml" command="load" ns="global_costmap" />
     <rosparam file="$(find 2D_Navigation_Stack)/launch/costmap_common_params.yaml" command="load" ns="local_costmap" />
     <rosparam file="$(find 2D_Navigation_Stack)/launch/local_costmap_params.yaml" command="load" />
     <rosparam file="$(find 2D_Navigation_Stack)/launch/global_costmap_params.yaml" command="load" />
-    <rosparam file="$(find 2D_Navigation_Stack)/launch/base_local_planner_params.yaml" command="load" />
+    <rosparam file="$(find 2D_Navigation_Stack)/launch/dwa_local_planner_params.yaml" command="load" />
+    <rosparam file="$(find 2D_Navigation_Stack)/launch/move_base_params.yaml" command="load" />
   </node>
 
-  <!--<node name="rviz" pkg="rviz" type="rviz" args="-d $(find rplidar_ros)/rviz/rplidar.rviz" />-->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find 2D_Navigation_Stack)/launch/navigation.rviz" />
 
 </launch>

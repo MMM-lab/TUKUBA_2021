@@ -1,6 +1,8 @@
 global_costmap:
   global_frame: map
+  # rpliderでnaviationの場合はbase_link
   #robot_base_frame: base_link
+  # シミュレーションでロボット動かす場合はbase_footprint
   robot_base_frame: base_footprint
   update_frequency: 1.0
   publish_frequency: 1.0

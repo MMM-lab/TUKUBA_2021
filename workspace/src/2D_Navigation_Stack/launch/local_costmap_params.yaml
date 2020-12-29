@@ -1,7 +1,9 @@
 local_costmap:
   global_frame: map
   #global_frame: odom
+  # rpliderでnaviationの場合はbase_link
   #robot_base_frame: base_link
+  # シミュレーションでロボット動かす場合はbase_footprint
   robot_base_frame: base_footprint
 
   update_frequency: 5.0

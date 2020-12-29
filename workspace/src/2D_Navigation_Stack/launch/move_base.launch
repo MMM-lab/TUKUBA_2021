@@ -2,15 +2,16 @@
 <launch>
   <!-- Arguments -->
   <!--<arg name="map_file" default="$(find 2D_Navigation_Stack)/maps/room_ok.yaml"/>-->
+  <!--<arg name="map_file" default="$(find 2D_Navigation_Stack)/maps/MK_room.yaml"/>-->
   <arg name="map_file" default="$(find 2D_Navigation_Stack)/maps/mymap.yaml"/>
 
   <!-- Run the map server -->
   <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" output="screen"/>
 
   <!-- AMCL -->
-  <include file="$(find 2D_Navigation_Stack)/launch/amcl.launch"/>
+  <!-- <include file="$(find 2D_Navigation_Stack)/launch/amcl.launch"/> -->
   <!-- tf -->
-  <node pkg="tf" type="static_transform_publisher" name="map" args="0 0 0 0 0 0 map odom 100"/>
+  <!-- <node pkg="tf" type="static_transform_publisher" name="map" args="0 0 0 0 0 0 map odom 100"/>
   <node pkg="tf" type="static_transform_publisher" name="base_footprint" args="0 0 0 0 0 0 odom base_footprint 100"/>
   <node pkg="tf" type="static_transform_publisher" name="base_link" args="0 0 0.05 0 0 0 base_footprint base_link 100" />
   <node pkg="tf" type="static_transform_publisher" name="wheel_1" args="0.1 0.15 0 0 0 -1.5707 base_link wheel_1 100"/>
@@ -18,7 +19,7 @@
   <node pkg="tf" type="static_transform_publisher" name="wheel_3" args="0.1 -0.15 0 0 0 -1.5707 base_link wheel_3 100"/>
   <node pkg="tf" type="static_transform_publisher" name="wheel_4" args="-0.1 -0.15 0 0 0 -1.5707 base_link wheel_4 100" />
   <node pkg="tf" type="static_transform_publisher" name="hokuyo_link" args="0.125 0.05 0.125 0 0 0 base_link hokuyo_link 100"/>
-  <node pkg="tf" type="static_transform_publisher" name="camera_link" args="0.125 0 0.125 0 0 0 base_link camera_link 100" />
+  <node pkg="tf" type="static_transform_publisher" name="camera_link" args="0.125 0 0.125 0 0 0 base_link camera_link 100" /> -->
   
   <!-- move base -->
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">

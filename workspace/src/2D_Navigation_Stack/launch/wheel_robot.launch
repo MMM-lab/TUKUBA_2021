@@ -20,8 +20,8 @@
   </include>
 
   <!--<arg name="model" default="$(find 2D_Navigation_Stack)/urdf/two_wheel_robot.urdf.xacro"/>-->
-  <arg name="model" default="$(find 2D_Navigation_Stack)/urdf/wheel_robot_base.urdf.xacro"/>
-  <!--<arg name="model" default="$(find 2D_Navigation_Stack)/urdf/gmapbot.xacro"/>-->
+  <arg name="model" default="$(find 2D_Navigation_Stack)/urdf/wheel_robot_base.urdf.xacro"/> 
+  <!-- <arg name="model" default="$(find 2D_Navigation_Stack)/urdf/gmapbot.xacro"/> -->
   <param name="robot_description" command="$(find xacro)/xacro $(arg model) --inorder"/>
 
   <!-- Setting gui parameter to true for display joint slider -->

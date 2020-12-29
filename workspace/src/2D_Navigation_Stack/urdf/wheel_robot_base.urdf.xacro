@@ -105,22 +105,19 @@
   </gazebo>
 
   <!-- Hokuyo Laser scanner -->
-  <property name="hokuyo_size" value="0.1" />
+  <!-- property name="hokuyo_size" value="0.1" /> -->
   <!-- hokuyo -->
-  <link name="hokuyo_link">
+  <!-- <link name="hokuyo_link">
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <!--<box size="${hokuyo_size} ${hokuyo_size} ${hokuyo_size}"/>-->
+        <!-<box size="${hokuyo_size} ${hokuyo_size} ${hokuyo_size}"/>
         <cylinder length="${hokuyo_size * 2}" radius="${hokuyo_size}" />
       </geometry>
       <material name="Gray" />
     </visual>
   </link>
   <joint name="hokuyo_joint" type="fixed">
-<!--    
-<origin xyz="${base_radius - hokuyo_size/2} 0 ${base_height+hokuyo_size/4}" rpy="0 0 0" />
--->
     <origin xyz="${hokuyo_size/2} 0 ${0.2+hokuyo_size/4}" rpy="0 0 0" />
     <parent link="base_link"/>
     <child link="hokuyo_link" />
@@ -152,7 +149,6 @@
         <frameName>hokuyo_link</frameName>
       </plugin>
     </sensor>
-  </gazebo>
+  </gazebo> -->
 
- 
 </robot>
